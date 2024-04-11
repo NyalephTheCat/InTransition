@@ -1,0 +1,141 @@
+// Define base colors
+$background-color: #222;
+$shadow-color: rgba(0, 0, 0, 0.5);
+$hover-transition: translateY(-4px);
+$base-font-size: 16px;
+$line-height: 1.5;
+$base-padding: 8px;
+$base-margin: 4px;
+$border-radius: 8px;
+$transition-speed: 0.3s;
+
+.character-link {
+  border-radius: $border-radius;
+  padding: $base-padding;
+  margin: $base-margin;
+  cursor: pointer;
+  transition: background-color $transition-speed ease, transform 0.2s ease;
+  background-color: var(--character-bg);
+  color: var(--character-fg);
+  font-size: $base-font-size;
+  line-height: $line-height;
+  text-decoration: none; // Remove underlines from links for a cleaner look
+
+  &:hover {
+    transform: $hover-transition;
+    box-shadow: 0 4px 6px $shadow-color; // Subtle shadow on hover for depth
+    color: var(--character-fg);
+  }
+}
+
+.character-sheet {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 80vw;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 15px $shadow-color;
+  border-radius: $border-radius;
+  padding: 20px;
+  background-color: $background-color;
+  color: var(--character-fg);
+  font-size: $base-font-size;
+  line-height: $line-height;
+}
+
+// Header and titles
+.cs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--character-fg);
+  padding-bottom: 10px;
+}
+
+.cs-title {
+  font-size: 24px;
+  color: var(--character-fg);
+  margin: 0;
+}
+
+.cs-first-name, .cs-last-name {
+  font-weight: bold;
+}
+
+.cs-pronouns {
+  font-size: 18px;
+  color: var(--character-fg);
+  text-align: right;
+
+  // Add a / between each of the pronoun
+  & > * + *::before {
+    content: '/';
+    margin: 0 5px;
+  }
+}
+
+// Table styling
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.cs-table-label, .cs-table-value, .cs-table-other, .cs-table-type, .cs-table-strength {
+  padding: 10px;
+  border-bottom: 1px solid lighten($background-color, 10%);
+}
+
+.cs-table-label {
+  font-weight: bold;
+  color: var(--character-fg);
+}
+
+// Section titles
+.cs-description-title, .cs-relationships-title, .cs-skills-title {
+  color: var(--character-fg);
+  border-bottom: 2px solid lighten($background-color, 20%);
+  padding-bottom: 5px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+// Descriptive text
+.cs-description-text, .cs-skills-item {
+  color: var(--character-fg);
+  line-height: $line-height;
+}
+
+// Lists for skills, likes, and traits
+.cs-skills-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.cs-skills-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.cs-skills-name {
+  font-weight: bold;
+}
+
+// Apply a responsive design approach
+@media (max-width: 768px) {
+  .cs-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cs-pronouns {
+    text-align: left;
+    margin-top: 10px;
+  }
+}

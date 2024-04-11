@@ -1,0 +1,30 @@
+sugarcube-2:
+  macros:
+    dialogue:
+      name: dialogue
+      container: true
+    pronouns:
+      name: pronouns
+    nav-history:
+      name: nav-history
+    analogClock:
+      name: analogClock
+    postcard:
+      name: postcard
+    character:
+      name: character
+    theme-selector:
+      name: theme-selector
+    reduced-motion-selector:
+      name: reduced-motion-selector
+    storylet-start:
+      name: storylet-start
+    storylet:
+      name: storylet
+    note:
+      name: note
+      container: true
+    storyletLink:
+      name: storyletLink
+    storyletClose:
+      name: storyletClose

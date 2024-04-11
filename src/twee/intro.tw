@@ -1,0 +1,5 @@
+:: base_intro_start
+This is test passage <<storyletLink "base_intro_end" "Go to the end">>
+
+:: base_intro_end
+This is the end of the test passage. <<storyletClose>>

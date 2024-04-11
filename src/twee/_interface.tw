@@ -1,0 +1,92 @@
+:: StoryInterface
+<div id="interface">
+  <header id="story-header" data-passage="story-header"></header>
+  <div id="passages"></div>
+  <footer id="story-footer">
+    <div id="event-tag" data-passage="story-event-tag"></div>
+    <div id="nav-buttons" data-passage="story-nav-buttons"></div>
+  </footer>
+</div>
+
+
+:: story-header [nobr]
+<div id="header-content">
+  <span id="story-location"><<= $story.location>></span>
+  <div id="story-datetime">
+    <<if $story.time>>
+    <span id="story-date">
+      <span id="story-day-name"><<= $story.time.day>></span>,
+      <span id="story-day-number"><<= $story.time.num>></span>
+      <span id="story-day-month"><<= $story.time.month>></span>
+      <span id="story-year"><<= $story.time.year>></span>
+    </span>
+    <span id="story-time">
+      <span id="story-time-hour"><<= $story.time.hour>></span>:
+      <span id="story-time-minute"><<= $story.time.min>></span>
+      <span id="story-time-ampm"><<= $story.time.ampm>></span>
+    </span>
+    <</if>>
+  </div>
+</div>
+
+<<script>>
+
+// When the passage is rendered, update the info
+$(document).on(':passageend', () => {
+  $('#story-location').text(State.location);
+  $('#story-day-name').text(State.time.day);
+  $('#story-day-number').text(State.time.num);
+  $('#story-day-month').text(State.time.month);
+  $('#story-year').text(State.time.year);
+  $('#story-time-hour').text(State.time.hour);
+  $('#story-time-minute').text(State.time.min);
+  $('#story-time-ampm').text(State.time.ampm);
+});
+
+<</script>>
+
+:: story-event-tag [nobr]
+<<if $storylet>>
+<<set _storylet to NarrativeManager.getStorylet($storylet.id)>>
+<span id="event-tag-name"><<= _storylet.title>></span>
+<!-- Preceed with @ -->
+<span id="event-tag-author"><<= _storylet.author>></span>
+<</if>>
+
+:: story-nav-buttons [nobr]
+<button id="nav-back" class="nav-button">
+  <i class="fas fa-arrow-left"></i>
+</button>
+<button id="nav-forward" class="nav-button">
+  <i class="fas fa-arrow-right"></i>
+</button>
+<!--
+<button id="nav-character" class="nav-button">
+  <i class="fas fa-user"></i>
+</button>
+-->
+<button id="nav-save" class="nav-button">
+  <i class="fas fa-save"></i>
+</button>
+<button id="nav-restart" class="nav-button">
+  <i class="fas fa-redo"></i>
+</button>
+<button id="nav-settings" class="nav-button">
+  <i class="fas fa-cog"></i>
+</button>
+
+<<script>>
+
+$('#nav-back')
+  .on('click', () => { Engine.backward() })
+  .ariaDisabled(State.current == State.bottom);
+
+$('#nav-forward')
+  .on('click', () => { Engine.forward() })
+  .ariaDisabled(State.current == State.top);
+
+$('#nav-save').on('click', () => { UI.saves() });
+$('#nav-restart').on('click', () => { UI.restart() });
+$('#nav-settings').on('click', () => { UI.settings(); });
+
+<</script>>

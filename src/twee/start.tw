@@ -1,0 +1,39 @@
+:: StoryInit
+<<set $story = {
+  location: "In transition",
+  time: null
+}>>
+<<set $event = {
+  name: "Intro",
+  author: "Nyaleph",
+}>>
+
+:: Start
+
+Welcome to <strong>In Transition</strong>, a game where you explore your gender identity while facing the ups and downs of moving into a new town. It's about finding out who you are and dealing with life's twists and turns along the way.
+
+Jump into an adventure that's all about feelings, choices, and connections. Your decisions will guide the story and affect how you get along with others in the game. You'll make friends, maybe fall in love, and discover a whole community with its own unique tales and challenges. Ready to see what's out there?
+
+<<note "dev">>This game is currently being developed. We're pouring our hearts into creating a world that's both inclusive and reflective of the diverse experiences within the LGBTQ+ community. Your feedback and support are invaluable as we continue to refine and expand the narrative.<</note>>
+
+You are playing version <<= $version >> of the game.
+
+Ready to start your journey? [[Let's go|StoryStart]].
+
+[[StoryletDebug]]
+
+:: StoryStart
+<<set $story = {
+  location: "New Town",
+  time: {
+    day: "Wed",
+    num: 10,
+    month: "Apr",
+    year: 2024,
+    hour: 10,
+    min: 50,
+    ampm: "AM"
+  }
+}>>
+
+<<storylet>>

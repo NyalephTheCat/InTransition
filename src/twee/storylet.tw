@@ -1,0 +1,31 @@
+:: Storylet [nobr]
+<!-- Storylet is stored in $storylet as { id: StoryletId, passage: PassageId } -->
+<!-- We will now render the passage -->
+<<set _storylet to NarrativeManager.getStorylet($storylet.id)>>
+<<run console.log(_storylet)>>
+<<set _passage to _storylet.passages[$storylet.passage]>>
+
+<!-- Render the passage -->
+<<= _passage>>
+
+:: StoryletDebug [nobr]
+<h1>Storylet debug</h1>
+<h2>Existing storylets</h2>
+<ul>
+<<for _storylet range NarrativeManager.storylets>>
+  <li>
+    <<= _storylet.id>> <<run console.log(_storylet)>>
+    <<for _tag range _storylet.tags>>
+      <span class="tag"><<= _tag>></span>
+    <</for>>
+
+    <ul>
+      <<for _passageId, _passageContent range _storylet.passages>>
+        <li>
+          <<= _passageId>>
+        </li>
+      <</for>>
+    </ul>
+  </li>
+<</for>>
+</ul>
