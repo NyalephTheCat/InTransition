@@ -4,7 +4,7 @@ import { NarrativeManager } from "./manager/storylet";
 Save.onSave.add((save: SaveObject, details: SaveDetails) => {
   // Save all storylet informations
   save.metadata = { 
-    playedStorylets: NarrativeManager.playedStorylets
+    playedStorylets: NarrativeManager.playedStorylets,
   };
 })
 

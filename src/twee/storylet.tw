@@ -9,23 +9,50 @@
 <<= _passage>>
 
 :: StoryletDebug [nobr]
-<h1>Storylet debug</h1>
-<h2>Existing storylets</h2>
-<ul>
-<<for _storylet range NarrativeManager.storylets>>
-  <li>
-    <<= _storylet.id>> <<run console.log(_storylet)>>
-    <<for _tag range _storylet.tags>>
-      <span class="tag"><<= _tag>></span>
-    <</for>>
+<h1>Storylet Debug</h1>
 
-    <ul>
-      <<for _passageId, _passageContent range _storylet.passages>>
-        <li>
-          <<= _passageId>>
-        </li>
-      <</for>>
-    </ul>
-  </li>
-<</for>>
+<h2>Existing Storylets</h2>
+<ul>
+  <<for _storylet range NarrativeManager.storylets>>
+    <li>
+      <b>ID:</b> <<= _storylet.id>><br>
+      <b>Title:</b> <<= _storylet.title>><br>
+      <b>Author:</b> <<= _storylet.author>><br>
+      <b>Weight:</b> <<= _storylet.weight>><br>
+      <b>Priority:</b> <<= _storylet.priority>><br>
+      <b>Replayable:</b> <<= _storylet.replayable ? "Yes" : "No">><br>
+      <b>Tags:</b> <<for _tag range _storylet.tags>><span class="tag"><<= _tag>></span> <</for>><br>
+      <b>Requirements:</b> <<requirement _storylet.requirements>>
+      <ul>
+        <<for _passageId, _passageContent range _storylet.passages>><<capture _passageId>>
+          <li>
+            <b>Passage ID:</b> <<= _passageId>><<if _passageId == _storylet.startPassage>> <span class="tag">Start</span><</if>><br>
+            <b>Passage Link:</b> <<storylet _storylet.id _passageId>>
+          </li>
+        <</capture>><</for>>
+      </ul>
+    </li>
+  <</for>>
 </ul>
+
+<h2>Playable Storylets</h2>
+<ul>
+  <<for _storylet range $playableStorylets>>
+    <li><<= _storylet>></li>
+  <</for>>
+</ul>
+
+<h2>Available Storylets</h2>
+<ul>
+  <<for _storylet range NarrativeManager.available>>
+    <li><<= _storylet>></li>
+  <</for>>
+</ul>
+
+<h2>Current Storylet</h2>
+<<if $storylet>>
+  <b>ID:</b> <<= $storylet.id>><br>
+  <b>Passage:</b> <<= $storylet.passage>><br> 
+<<else>>
+  <i>No storylet selected</i>
+<</if>>

@@ -10,7 +10,7 @@ export class Serializable {
     return this;
   }
 
-  public clone() { return Object.assign(Object.create(Object.getPrototypeOf(this)), this) }
+  public clone() { return Object.create(Object.getPrototypeOf(this))._init(this) }
 
   public toJSON() {
     // Create object with all properties

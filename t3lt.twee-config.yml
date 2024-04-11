@@ -28,3 +28,5 @@ sugarcube-2:
       name: storyletLink
     storyletClose:
       name: storyletClose
+    requirement:
+      name: requirement

@@ -19,3 +19,11 @@ Macro.add('note', {
 });
 
 (State.variables as any).version = '0.0.1';
+
+Setting.addToggle('debug', {
+  label: 'Debug Mode',
+  default: false,
+  onChange: () => {
+    Config.debug = (settings as any).debug;
+  }
+});

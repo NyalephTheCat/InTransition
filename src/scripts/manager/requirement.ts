@@ -1,9 +1,12 @@
-import { NarrativeManager as NarrativeManager } from "./storylet";
+import { Serializable } from "../utils/serializable";
+import { NarrativeManager } from "./storylet";
 
-export abstract class Requirement {
-  constructor(public expected: boolean) {}
+export abstract class Requirement extends Serializable {
+  constructor(public expected: boolean) { super(); }
 
   abstract check(...context: any[]): boolean;
+
+  abstract display(): JQuery<HTMLElement>;
 }
 
 export enum RequirementCompositeOperator { AND = "AND", OR = "OR" }
@@ -23,7 +26,23 @@ export class RequirementComposite extends Requirement {
       return this.requirements.some((requirement) => requirement.check(...context) === this.expected);
     }
   }
+
+  display(): JQuery<HTMLElement> {
+    const operatorString = this.operator === RequirementCompositeOperator.AND ? "AND" : "OR";
+    const requirementsDisplay = this.requirements.map(req => req.display());
+    const $container = $('<span></span>');
+
+    for (let i = 0; i < requirementsDisplay.length; i++) {
+      $container.append(requirementsDisplay[i]);
+      if (i < requirementsDisplay.length - 1) {
+        $container.append(`<span class="${operatorString.toLowerCase()}">${operatorString}</span>`);
+      }
+    }
+
+    return $container;
+  }
 }
+(window as any).RequirementComposite = RequirementComposite;
 
 export class RequirementStoryletPlayed extends Requirement {
   constructor(
@@ -36,7 +55,13 @@ export class RequirementStoryletPlayed extends Requirement {
   check(): boolean {
     return NarrativeManager.playedStorylets.has(this.storyletId) === this.expected;
   }
+
+  display(): JQuery<HTMLElement> {
+    const playedString = this.expected ? "played" : "not played";
+    return $(`<span>Storylet "${this.storyletId}" ${playedString}</span>`);
+  }
 }
+(window as any).RequirementStoryletPlayed = RequirementStoryletPlayed;
 
 export class RequirementAlways extends Requirement {
   constructor(expected: boolean = true) {
@@ -46,7 +71,12 @@ export class RequirementAlways extends Requirement {
   check(): boolean {
     return this.expected;
   }
+
+  display(): JQuery<HTMLElement> {
+    return $('<span>Always</span>');
+  }
 }
+(window as any).RequirementAlways = RequirementAlways;
 
 export class RequirementVariable extends Requirement {
   constructor(
@@ -60,7 +90,12 @@ export class RequirementVariable extends Requirement {
   check(): boolean {
     return this.requirement.check(State.getVar(this.variable));
   }
+
+  display(): JQuery<HTMLElement> {
+    return $(`<span>${this.variable} </span>`).add(this.requirement.display());
+  }
 }
+(window as any).RequirementVariable = RequirementVariable;
 
 export enum RequirementVariableComparator { 
   EQ = "==",
@@ -99,6 +134,20 @@ export class RequirementVariableComp<T> extends Requirement {
   check(currentValue: T): boolean {
     return this._check(currentValue) === this.expected;
   }
-}
 
-// TODO: Add more requirements as needed
+  display(): JQuery<HTMLElement> {
+    return $(`<span>${this.comparator} ${this.expectedValue}</span>`);
+  }
+}
+(window as any).RequirementVariableComp = RequirementVariableComp;
+
+Macro.add("requirement", {
+  handler() {
+    // displays a requirement passed as an argument
+    const requirement = this.args[0];
+    if (!(requirement instanceof Requirement)) {
+      return;
+    }
+    $(this.output).append(requirement.display());
+  }
+});

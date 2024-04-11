@@ -1,5 +1,5 @@
 import { Serializable } from "../utils/serializable";
-import { Requirement } from "./requirement";
+import { Requirement, RequirementStoryletPlayed } from "./requirement";
 
 export class Storylet extends Serializable {
   constructor(
@@ -12,12 +12,12 @@ export class Storylet extends Serializable {
     public priority: number = 0,
     public requirements: Requirement | undefined = undefined,
     public replayable: boolean = true,
-    public tags: string[] = []
+    public tags: Set<string> = new Set()
   ) { 
     super()
 
     if (this.id.startsWith("base:")) {
-      this.tags.push("base");
+      this.tags.add("base");
     }
 
     this.passages = Object.keys(passages).reduce((acc, key) => {
@@ -48,6 +48,7 @@ export class Storylet extends Serializable {
     delete (State.variables as any).storylet;
   }
 }
+(window as any).Storylet = Storylet;
 
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -125,7 +126,7 @@ export class NarrativeManager {
     }
   }
 
-  static async addStorylet(storylet: Storylet) {
+  static async addStorylet(storylet: Storylet, asPlayable: boolean = false) {
     this.storylets[storylet.id] = storylet;
     try {
       const db: IDBDatabase = await openDatabase();
@@ -136,22 +137,34 @@ export class NarrativeManager {
     } catch (error) {
       console.error('Failed to save storylet to IndexedDB:', error);
     }
+
+    if (asPlayable) {
+      (State.variables as any).playableStorylets.add(storylet.id);
+    }
   }
 
-  static addStorylets(storylets: any[]) {
+  static addStorylets(storylets: any[], asPlayable: boolean = false) {
     storylets.forEach(async (storylet) => {
-      await this.addStorylet(storylet);
+      await this.addStorylet(storylet, asPlayable);
     });
+  }
+
+  static get available(): Set<string> {
+    return new Set(Array.from((State.variables as any).playableStorylets as Set<string>)
+    .map(id => this.storylets[id])
+    .filter(storylet => {
+      const requirementsMet = !storylet.requirements || storylet.requirements.check();
+      const isReplayableOrNew = storylet.replayable || !this.playedStorylets.has(storylet.id);
+      return requirementsMet && isReplayableOrNew;
+    }).map(storylet => storylet.id))
   }
 
   static pickStorylet(context: any = {}): Storylet | undefined {
     // Filter available storylets based on requirements and replayability
-    const availableStorylets = Object.values(this.storylets)
-      .filter(storylet => {
-        const requirementsMet = !storylet.requirements || storylet.requirements.check(context);
-        const isReplayableOrNew = storylet.replayable || !this.playedStorylets.has(storylet.id);
-        return requirementsMet && isReplayableOrNew;
-      });
+    if ((State.variables as any).playableStorylets.size === 0) {
+      return undefined;
+    }
+    const availableStorylets = Array.from((State.variables as any).playableStorylets as Set<string>).map(id => this.storylets[id]);
 
     if (availableStorylets.length === 0) {
       return undefined;
@@ -169,7 +182,7 @@ export class NarrativeManager {
 
     // Select among the highest priority storylets based on weight
     const highestPriorityStorylets = groupedByPriority[highestPriority];
-    const totalWeight = highestPriorityStorylets.reduce((sum, storylet) => sum + (storylet.weight || 1), 0);
+    const totalWeight = highestPriorityStorylets.reduce((sum: any, storylet: { weight: any; }) => sum + (storylet.weight || 1), 0);
 
     // Generate a random number in the range of total weight
     let random = Math.random() * totalWeight;
@@ -186,6 +199,7 @@ export class NarrativeManager {
 }
 (window as any).NarrativeManager = NarrativeManager;
 $(NarrativeManager.init);
+(State.variables as any).playableStorylets = new Set();
 
 Setting.addToggle("clearStorylets", {
   label: "Clear Storylets",
@@ -202,19 +216,24 @@ Macro.add("storylet", {
   handler() {
     let storyletId;
     let storylet;
-    if (this.args.length === 1) {
+    if (this.args.length >= 1) {
       storyletId = this.args[0];
       storylet = NarrativeManager.getStorylet(storyletId);
     } else {
       storylet = NarrativeManager.pickStorylet();
+    }
+    let passage = null;
+    if (this.args.length >= 2) {
+      passage = this.args[1];
     }
 
     if (!storylet) {
       return this.error(`Storylet not found: ${storyletId}`);
     }
 
-    storylet.start();
-    $(this.output).wiki("[[Storylet]]");
+    let action = '<<run NarrativeManager.getStorylet("' + storylet.id + '").start()>>' + (passage ? `<<run NarrativeManager.getStorylet("${storylet.id}").next("${passage}")>>` : '');
+
+    $(this.output).wiki(`<<link 'Storylet' 'Storylet'>>${action}<</link>>`);
 
     return true;
   },
@@ -250,4 +269,12 @@ NarrativeManager.addStorylets([
     base_intro_start: null,
     base_intro_end: null,
   }, "base_intro_start"),
-]);
+], true);
+
+NarrativeManager.addStorylet(
+  new Storylet("base:outro", "Outro", "nyaleph", {
+    base_outro_start: null,
+    base_outro_end: null,
+  }, "base_outro_start", 1, 0, new RequirementStoryletPlayed("base:intro")),
+  true
+);
