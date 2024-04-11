@@ -19,6 +19,6 @@ export class Serializable {
       return acc
     }, {})
 
-    return JSON.reviveWrapper(`(new ${this.constructor.name}())._init($ReviveData$})`, obj)
+    return JSON.reviveWrapper(`(new ${this.constructor.name}())._init($ReviveData$)`, obj)
   }
 }

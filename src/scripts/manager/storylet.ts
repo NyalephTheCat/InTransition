@@ -108,8 +108,8 @@ export class NarrativeManager {
 
       request.onsuccess = (e: any) => {
         const storylets = e.target.result;
-        storylets.forEach((storylet: Storylet) => {
-          NarrativeManager.storylets[storylet.id] = (new Storylet())._init(storylet);
+        storylets.forEach((storylet: { id: string, data: string }) => {
+          NarrativeManager.storylets[storylet.id] = JSON.parse(storylet.data);
         });
       };
     } catch (error) {
@@ -133,7 +133,12 @@ export class NarrativeManager {
       const transaction = db.transaction(['storylets'], 'readwrite');
       const store = transaction.objectStore('storylets');
 
-      store.put(storylet);
+      const toStore = {
+        id: storylet.id,
+        data: JSON.stringify(storylet),
+      }
+
+      store.put(toStore);
     } catch (error) {
       console.error('Failed to save storylet to IndexedDB:', error);
     }
