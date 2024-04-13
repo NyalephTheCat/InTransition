@@ -1,5 +1,7 @@
 :: base_intro_start
-This is test passage <<storyletLink "base_intro_end" "Go to the end">>
+This is test passage. <<storyletLink "base_intro_end" "Go to the end">>
+Here is an npc called <<= _npc1.fullName>> 
 
 :: base_intro_end
 This is the end of the test passage. <<storyletClose>>
+<<= _npc1.fullName>> talks to <<= _npc2.fullName>>

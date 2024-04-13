@@ -41,10 +41,10 @@ export class Storylet extends Serializable {
   }
 
   next(passage: string) {
-    (State.variables as any).storylet = {
+    (State.variables as any).storylet = Object.assign({
       id: this.id,
-      passage,
-    }
+      passage,      
+    }, (State.variables as any).storylet);
   }
 
   close() {

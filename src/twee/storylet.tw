@@ -2,8 +2,11 @@
 <!-- Storylet is stored in $storylet as { id: StoryletId, passage: PassageId } -->
 <!-- We will now render the passage -->
 <<set _storylet to NarrativeManager.getStorylet($storylet.id)>>
-<<run console.log(_storylet)>>
 <<set _passage to _storylet.passages[$storylet.passage]>>
+<<set _npcs to $storylet.npcs>>
+<<for _slotName, _npc range _npcs>>
+  <<run State.temporary[_slotName] = _npc>>
+<</for>>
 
 <!-- Render the passage -->
 <<= _passage>>
@@ -77,3 +80,4 @@
     <i>No storylet selected</i>
   <</if>>
 </section>
+
