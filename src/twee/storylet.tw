@@ -10,49 +10,70 @@
 
 :: StoryletDebug [nobr]
 <h1>Storylet Debug</h1>
-
-<h2>Existing Storylets</h2>
-<ul>
-  <<for _storylet range NarrativeManager.storylets>>
-    <li>
-      <b>ID:</b> <<= _storylet.id>><br>
-      <b>Title:</b> <<= _storylet.title>><br>
-      <b>Author:</b> <<= _storylet.author>><br>
-      <b>Weight:</b> <<= _storylet.weight>><br>
-      <b>Priority:</b> <<= _storylet.priority>><br>
-      <b>Replayable:</b> <<= _storylet.replayable ? "Yes" : "No">><br>
-      <b>Tags:</b> <<for _tag range _storylet.tags>><span class="tag"><<= _tag>></span> <</for>><br>
-      <b>Requirements:</b> <<requirement _storylet.requirements>>
-      <ul>
-        <<for _passageId, _passageContent range _storylet.passages>><<capture _passageId>>
-          <li>
-            <b>Passage ID:</b> <<= _passageId>><<if _passageId == _storylet.startPassage>> <span class="tag">Start</span><</if>><br>
-            <b>Passage Link:</b> <<storylet _storylet.id _passageId>>
+<section id="debug-body">
+  <h2>Existing Storylets</h2>
+  <ul>
+    <<for _storylet range NarrativeManager.storylets>>
+      <li class="storylet">
+        <b>ID:</b> <<= _storylet.id>><br>
+        <b>Title:</b> <<= _storylet.title>><br>
+        <b>Author:</b> <<= _storylet.author>><br>
+        <b>Weight:</b> <<= _storylet.weight>><br>
+        <b>Priority:</b> <<= _storylet.priority>><br>
+        <b>Replayable:</b> <<= _storylet.replayable ? "Yes" : "No">><br>
+        <b>Tags:</b> <<for _tag range _storylet.tags>><span class="tag"><<= _tag>></span> <</for>><br>
+        <b>Requirements:</b> <<requirement _storylet.requirements>><br>
+        <b>Passages:</b> <ul>
+          <<for _passageId, _passageContent range _storylet.passages>>
+          <li class="passage">
+            <<storylet _passageId _storylet.id _passageId>><<if _passageId == _storylet.startPassage>> <span class="tag">Start</span><</if>><br>
           </li>
-        <</capture>><</for>>
+          <</for>>
+        </ul>
+      </li>
+      <b>Npcs:</b>
+      <<if Object.keys(_storylet.npcs).length>>
+      <ul>
+        <<for _npcId, _npcRequriement range _storylet.npcs>>
+        <li>
+          <b>ID:</b> <<= _npcId>><br>
+          <b>Requirement:</b> <<requirement _npcRequriement>><br>
+          <b>Valid:</b>
+          <ul>
+          <<for _npc range $npcManager.findNPC(_npcRequriement)>>
+            <li><<= _npc.fullName>></li>
+          <</for>>  
+          </ul>
+        </li>
+        <</for>>
       </ul>
-    </li>
-  <</for>>
-</ul>
+      <<else>>
+      <i>No NPCs</i>
+      <</if>>
+    <</for>>
+  </ul>
 
-<h2>Playable Storylets</h2>
-<ul>
-  <<for _storylet range $playableStorylets>>
+  <h2>Playable Storylets</h2>
+    <ul>
+      <<for _storylet range $playableStorylets>>
+      <li><<= _storylet>></li>
+      <</for>>
+    </ul>
+
+  <h2>Available Storylets</h2>
+  <ul>
+    <<for _storylet range NarrativeManager.available>>
     <li><<= _storylet>></li>
-  <</for>>
-</ul>
+    <</for>>
+  </ul>
 
-<h2>Available Storylets</h2>
-<ul>
-  <<for _storylet range NarrativeManager.available>>
-    <li><<= _storylet>></li>
-  <</for>>
-</ul>
-
-<h2>Current Storylet</h2>
-<<if $storylet>>
-  <b>ID:</b> <<= $storylet.id>><br>
-  <b>Passage:</b> <<= $storylet.passage>><br> 
-<<else>>
-  <i>No storylet selected</i>
-<</if>>
+  <h2>Current Storylet</h2>
+  <<if $storylet>>
+    <div>
+      <b>ID:</b> <<= $storylet.id>><br>
+      <b>Passage:</b> <<= $storylet.passage>><br>
+    </div>
+  <<else>>
+    <i>No storylet selected</i>
+  <</if>>
+</section>

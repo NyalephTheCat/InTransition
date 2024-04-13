@@ -1,4 +1,5 @@
 import './manager/storylet'
+import './manager/npc'
 import './save'
 
 Macro.add('note', {

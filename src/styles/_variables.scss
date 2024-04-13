@@ -1,0 +1,24 @@
+// Color variables
+$trans-pink: #f7a8b8;
+$trans-blue: #55cdfc;
+$trans-white: #ffffff;
+$soft-grey: #e9e9e9;
+$dark-grey: #333;
+
+$header-gradient: linear-gradient(45deg, $trans-pink, $soft-grey, $trans-blue);
+$header-gradient-dark: linear-gradient(
+  45deg,
+  darken($trans-pink, 10%),
+  darken($soft-grey, 10%),
+  darken($trans-blue, 10%)
+);
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap");
+
+// Size variables
+$base-padding: 1rem;
+$small-padding: 0.5rem;
+$base-font-size: 1rem;
+$small-font-size: 0.8rem;
+$large-font-size: 1.2rem;

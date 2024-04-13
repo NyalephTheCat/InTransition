@@ -1,0 +1,117 @@
+.message {
+  padding: $base-padding;
+  font-size: $base-font-size;
+  background-color: $trans-white;
+  border-radius: $base-padding;
+  box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.12);
+  color: $dark-grey;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+  font-family: "Noto Sans", sans-serif;
+
+  div {
+    display: inline;
+    margin-right: $small-padding;
+  }
+
+  &-type {
+    font-size: $small-font-size;
+    font-weight: bold;
+    color: $soft-grey;
+    margin-bottom: $small-padding;
+    text-transform: uppercase;
+    background-color: $dark-grey;
+    padding: 0.25rem $small-padding;
+    border-radius: 0.25rem;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+    &::before {
+      content: "[";
+    }
+
+    &::after {
+      content: "]";
+    }
+  }
+
+  &.error,
+  &.success,
+  &.warning,
+  &.dev {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  &.error {
+    background-color: lighten($trans-pink, 10%);
+    color: darken($trans-pink, 20%);
+  }
+
+  &.success {
+    background-color: lighten($trans-blue, 10%);
+    color: darken($trans-blue, 20%);
+  }
+
+  &.warning {
+    background-color: lighten($soft-grey, 10%);
+    color: $dark-grey;
+  }
+
+  &.dev {
+    background-color: lighten($trans-blue, 30%);
+    color: darken($trans-blue, 30%);
+    border: 4px dashed $trans-pink;
+  }
+}
+
+.error-view {
+  color: $trans-white;
+}
+
+.tag {
+  font-size: $small-font-size;
+  font-weight: bold;
+  color: $soft-grey;
+  margin-bottom: $small-padding;
+  text-transform: uppercase;
+  background-color: $dark-grey;
+  padding: 0.25rem $small-padding;
+  border-radius: 0.25rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+  &::before {
+    content: "[";
+  }
+
+  &::after {
+    content: "]";
+  }
+}
+
+input, input[type="text"], textarea {
+  font-size: $base-font-size;
+  padding: $small-padding;
+  border: 1px solid $soft-grey;
+  border-radius: $small-padding;
+  margin-bottom: $small-padding;
+  transition: border-color 0.3s ease;
+
+  color: $dark-grey;
+  background-color: #e9e9e9;
+  
+  &:not(:disabled):hover, &:not(:disabled):focus {
+    border-color: $trans-pink;
+    background-color: $trans-white;
+  }
+
+  &:focus {
+    border-color: $trans-blue;
+  }
+}

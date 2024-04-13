@@ -1,4 +1,5 @@
 import { Serializable } from "../utils/serializable";
+import { NPC } from "./npc";
 import { NarrativeManager } from "./storylet";
 
 export abstract class Requirement extends Serializable {
@@ -114,7 +115,7 @@ export class RequirementVariableComp<T> extends Requirement {
     super(expected);
   }
 
-  private _check(currentValue: T): boolean {
+  protected _check(currentValue: T): boolean {
     switch (this.comparator) {
       case RequirementVariableComparator.EQ:
         return currentValue === this.expectedValue;
@@ -140,6 +141,24 @@ export class RequirementVariableComp<T> extends Requirement {
   }
 }
 (window as any).RequirementVariableComp = RequirementVariableComp;
+
+export class RequirementLastName extends Requirement {
+  constructor(
+    public lastName: string,
+    expected: boolean = true
+  ) {
+    super(expected);
+  }
+
+  check(npc: NPC): boolean {
+    return (npc.lastName === this.lastName) === this.expected;
+  }
+
+  display(): JQuery<HTMLElement> {
+    return $(`<span>Last name is ${this.lastName}</span>`);
+  }
+}
+(window as any).RequirementLastName = RequirementLastName;
 
 Macro.add("requirement", {
   handler() {

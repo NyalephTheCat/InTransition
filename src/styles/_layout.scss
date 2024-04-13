@@ -1,92 +1,10 @@
-@import 'variables';
-@import 'mixins';
-@import 'base';
-@import 'components';
-@import 'layout';
-@import 'animations';
-
-/*
-
-// Define base font size
-html {
-  font-size: 16px; // Default size for browsers
-}
-
-
-
-// Define keyframes for animations
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-10%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-10%);
-    opacity: 0;
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.95);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-// Mobile mixin for responsive design
-@mixin mobile {
-  @media screen and (max-width: 768px) {
-    @content;
-  }
-}
-
-// Base styles
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body,
-html {
-  height: 100%;
-  font-family: "Montserrat", sans-serif;
-  background-color: $soft-grey;
-  color: $dark-grey;
-}
-
 #interface {
   display: flex;
   flex-direction: column;
   height: 100%;
   background: $header-gradient;
 
-  @include mobile {
+  @include respond-to(mobile) {
     padding: $small-padding;
   }
 }
@@ -130,7 +48,7 @@ html {
   border-top-right-radius: 1.25rem;
   box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.1);
 
-  @include mobile {
+  @include respond-to(mobile) {
     padding: $base-padding;
     max-width: 100%;
     border-radius: 1.25rem;
@@ -156,7 +74,7 @@ html {
     content: "@";
   }
 
-  @include mobile {
+  @include respond-to(mobile) {
     position: relative;
     bottom: 0;
     left: 0;
@@ -173,7 +91,7 @@ html {
   gap: $small-padding;
   padding: $base-padding;
 
-  @include mobile {
+  @include respond-to(mobile) {
     position: relative;
     justify-content: space-evenly;
     width: 100%;
@@ -214,14 +132,14 @@ html {
       color: $trans-blue;
     }
 
-    @include mobile {
+    @include respond-to(mobile) {
       font-size: $small-font-size;
     }
   }
 }
 
 footer {
-  @include mobile {
+  @include respond-to(mobile) {
     display: block;
     justify-content: space-between;
 
@@ -401,123 +319,3 @@ footer {
     }
   }
 }
-
-.message {
-  padding: $base-padding;
-  font-size: $base-font-size;
-  background-color: $trans-white;
-  border-radius: $base-padding;
-  box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.12);
-  color: $dark-grey;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-  font-family: "Noto Sans", sans-serif;
-
-  div {
-    display: inline;
-    margin-right: $small-padding;
-  }
-
-  &-type {
-    font-size: $small-font-size;
-    font-weight: bold;
-    color: $soft-grey;
-    margin-bottom: $small-padding;
-    text-transform: uppercase;
-    background-color: $dark-grey;
-    padding: 0.25rem $small-padding;
-    border-radius: 0.25rem;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-
-    &::before {
-      content: "[";
-    }
-
-    &::after {
-      content: "]";
-    }
-  }
-
-  &.error,
-  &.success,
-  &.warning,
-  &.dev {
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
-  }
-
-  &.error {
-    background-color: lighten($trans-pink, 10%);
-    color: darken($trans-pink, 20%);
-  }
-
-  &.success {
-    background-color: lighten($trans-blue, 10%);
-    color: darken($trans-blue, 20%);
-  }
-
-  &.warning {
-    background-color: lighten($soft-grey, 10%);
-    color: $dark-grey;
-  }
-
-  &.dev {
-    background-color: lighten($trans-blue, 30%);
-    color: darken($trans-blue, 30%);
-    border: 4px dashed $trans-pink;
-  }
-}
-
-.error-view {
-  color: $trans-white;
-}
-
-.tag {
-  font-size: $small-font-size;
-  font-weight: bold;
-  color: $soft-grey;
-  margin-bottom: $small-padding;
-  text-transform: uppercase;
-  background-color: $dark-grey;
-  padding: 0.25rem $small-padding;
-  border-radius: 0.25rem;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-
-  &::before {
-    content: "[";
-  }
-
-  &::after {
-    content: "]";
-  }
-}
-
-input, input[type="text"], textarea {
-  font-size: $base-font-size;
-  padding: $small-padding;
-  border: 1px solid $soft-grey;
-  border-radius: $small-padding;
-  margin-bottom: $small-padding;
-  transition: border-color 0.3s ease;
-
-  color: $dark-grey;
-  background-color: #e9e9e9;
-  
-  &:not(:disabled):hover, &:not(:disabled):focus {
-    border-color: $trans-pink;
-    background-color: $trans-white;
-  }
-
-  &:focus {
-    border-color: $trans-blue;
-  }
-}
-
-*/

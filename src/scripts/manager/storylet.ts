@@ -1,5 +1,6 @@
 import { Serializable } from "../utils/serializable";
-import { Requirement, RequirementStoryletPlayed } from "./requirement";
+import { NPC, NPCManager } from "./npc";
+import { Requirement, RequirementAlways, RequirementLastName, RequirementStoryletPlayed } from "./requirement";
 
 export class Storylet extends Serializable {
   constructor(
@@ -12,6 +13,7 @@ export class Storylet extends Serializable {
     public priority: number = 0,
     public requirements: Requirement | undefined = undefined,
     public replayable: boolean = true,
+    public npcs: Record<string, Requirement> = {},
     public tags: Set<string> = new Set()
   ) { 
     super()
@@ -30,10 +32,11 @@ export class Storylet extends Serializable {
     }, {} as Record<string, string>);
   }
 
-  start() {
+  start(npcs: Record<string, NPC>) {
     (State.variables as any).storylet = {
       id: this.id,
       passage: this.startPassage,
+      npcs,
     }
   }
 
@@ -159,13 +162,13 @@ export class NarrativeManager {
     .map(id => this.storylets[id])
     .filter(storylet => {
       const requirementsMet = !storylet.requirements || storylet.requirements.check();
+      const npcRequirementsMet = storylet.npcs ? (State.variables as any).npcManager.findNPCs(storylet.npcs) !== null : true;
       const isReplayableOrNew = storylet.replayable || !this.playedStorylets.has(storylet.id);
-      return requirementsMet && isReplayableOrNew;
+      return requirementsMet && npcRequirementsMet && isReplayableOrNew;
     }).map(storylet => storylet.id))
   }
 
-  static pickStorylet(context: any = {}): Storylet | undefined {
-    // Filter available storylets based on requirements and replayability
+  static pickStorylet(context: any = {}): { storylet: Storylet, assignedNPCs: Record<string, NPC> } | undefined {
     if ((State.variables as any).playableStorylets.size === 0) {
       return undefined;
     }
@@ -194,12 +197,14 @@ export class NarrativeManager {
     for (const storylet of highestPriorityStorylets) {
       random -= storylet.weight || 1;
       if (random <= 0) {
-        return storylet;
+        const assignedNPCs = (State.variables as any).npcManager.findNPCs(storylet.npcs);
+        return { storylet, assignedNPCs };
       }
     }
 
-    let storylet = highestPriorityStorylets[0];
-    return storylet;
+    let storylet = highestPriorityStorylets[0];  // Assuming random selection logic results in this storylet
+    const assignedNPCs = (State.variables as any).npcManager.findNPCs(storylet.npcs);
+    return { storylet, assignedNPCs };
   }
 }
 (window as any).NarrativeManager = NarrativeManager;
@@ -221,24 +226,39 @@ Macro.add("storylet", {
   handler() {
     let storyletId;
     let storylet;
-    if (this.args.length >= 1) {
-      storyletId = this.args[0];
+    let npcs: Record<string, NPC> = {};
+    let message = this.args[0] ?? "Continue";
+    if (this.args.length >= 2) {
+      storyletId = this.args[1];
       storylet = NarrativeManager.getStorylet(storyletId);
+      npcs = (State.variables as any).npcManager.findNPCs(storylet.npcs)
     } else {
-      storylet = NarrativeManager.pickStorylet();
+      let _res = NarrativeManager.pickStorylet();
+      if (!_res) {
+        return this.error("No available storylets found.");
+      }
+      storylet = _res.storylet;
+      npcs = _res.assignedNPCs;
     }
     let passage = null;
-    if (this.args.length >= 2) {
-      passage = this.args[1];
+    if (this.args.length >= 3) {
+      passage = this.args[2];
     }
 
     if (!storylet) {
       return this.error(`Storylet not found: ${storyletId}`);
     }
 
-    let action = '<<run NarrativeManager.getStorylet("' + storylet.id + '").start()>>' + (passage ? `<<run NarrativeManager.getStorylet("${storylet.id}").next("${passage}")>>` : '');
+    $(this.output).append(
+      $('<a>', { class: 'macro-link', text: message, click: () => {
+        storylet.start(npcs);
+        
+        if (passage)
+          storylet.next(passage);
 
-    $(this.output).wiki(`<<link 'Storylet' 'Storylet'>>${action}<</link>>`);
+        Engine.play("Storylet");
+      } })
+    );
 
     return true;
   },
@@ -264,7 +284,7 @@ Macro.add("storyletClose", {
       return this.error("No active storylet found.");
     }
 
-    $(this.output).wiki(`<<link "Close" "Start">><<$storylet.close()>><</link>>`);
+    $(this.output).wiki(`<<link "Close" "Start">><<= NarrativeManager.getStorylet($storylet.id).close()>><</link>>`);
     return true;
   }
 });
@@ -273,7 +293,10 @@ NarrativeManager.addStorylets([
   new Storylet("base:intro", "Introduction", "nyaleph", {
     base_intro_start: null,
     base_intro_end: null,
-  }, "base_intro_start"),
+  }, "base_intro_start", 1, 0, undefined, false, {
+    npc1: new RequirementLastName("Smith"),
+    npc2: new RequirementAlways(true),
+  }, new Set(["base", "intro"])),
 ], true);
 
 NarrativeManager.addStorylet(

@@ -1,0 +1,18 @@
+$media-sizes: (
+  mobile: 768px,
+  tablet: 1024px,
+  desktop: 1280px,
+  widescreen: 1440px
+);
+
+@mixin respond-to($media) {
+  @media (max-width: map-get($media-sizes, $media)) {
+    @content;
+  }
+}
+
+@mixin respond-from($media) {
+  @media (min-width: map-get($media-sizes, $media)) {
+    @content;
+  }
+}
