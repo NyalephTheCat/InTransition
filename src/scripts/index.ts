@@ -1,30 +1,30 @@
-import './manager/storylet'
-import './manager/npc'
-import './save'
+import { SaveDetails, SaveObject } from "twine-sugarcube";
+import { NarrativeManager } from "./managers/narrativeManager";
 
-Macro.add('note', {
-  tags: null,
-  handler () {
-    const messageType = this.args[0];
-    const content = this.payload[0].contents;
+/// Import all the important things
+import './models/npc';
+import './models/requirement';
+import './models/storylet';
+import './managers/npcManager';
+import './managers/narrativeManager';
+import './utils/database';
+import './utils/serialize';
+import './utils/arrays';
 
-    $(this.output)
-      .append($('<div>', {
-        class: `message ${messageType}`,
-      }).append(
-        $('<div>', { class: 'message-type' }).text(messageType),
-        $('<div>', { class: 'message-content' }).wiki(content)
-      )
-    );
-  }
-});
+import './macros/storylets';
+import './macros/note';
 
-(State.variables as any).version = '0.0.1';
 
-Setting.addToggle('debug', {
-  label: 'Debug Mode',
-  default: false,
-  onChange: () => {
-    Config.debug = (settings as any).debug;
-  }
+
+
+Save.onSave.add((save: SaveObject, details: SaveDetails) => {
+  // Save all storylet informations
+  save.metadata = { 
+    playedStorylets: NarrativeManager.playedStorylets,
+  };
+})
+
+Save.onLoad.add((save: SaveObject) => {
+  // Load all storylet informations
+  NarrativeManager.playedStorylets = save.metadata.playedStorylets;
 });

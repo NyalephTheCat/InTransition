@@ -1,6 +1,6 @@
-import { Serializable } from "../utils/serializable";
+import { NarrativeManager } from "../managers/narrativeManager";
+import { Serializable } from "../utils/serialize";
 import { NPC } from "./npc";
-import { NarrativeManager } from "./storylet";
 
 export abstract class Requirement extends Serializable {
   constructor(public expected: boolean) { super(); }

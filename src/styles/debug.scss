@@ -19,6 +19,10 @@ header {
   }
 }
 
+header, .card {
+  border-radius: $base-padding;
+}
+
 // Card styling
 .card {
   background: $trans-white;

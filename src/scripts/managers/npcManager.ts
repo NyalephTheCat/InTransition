@@ -1,22 +1,7 @@
-import { Serializable } from "../utils/serializable";
-import { Requirement } from "./requirement";
-
-export class NPC extends Serializable {
-  constructor(
-    public id: string,
-    public firstName: string,
-    public lastName: string,
-    public experiences: string[] = [],
-    public traits: Record<string, any> = {},
-  ) {
-    super();
-  }
-
-  get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
-  }
-}
-(window as any).NPC = NPC;
+import { NPC } from "../models/npc";
+import { Requirement } from "../models/requirement";
+import { shuffleArray } from "../utils/arrays";
+import { Serializable } from "../utils/serialize";
 
 export class NPCManager extends Serializable {
   npcs: Record<string, NPC> = {};
@@ -60,7 +45,7 @@ export class NPCManager extends Serializable {
     let possibleNPCs = this.findNPC(requirements[key]).filter(npc => !assignedNPCs.has(npc.id));
 
     // Shuffle possibleNPCs to randomize selection
-    this.shuffleArray(possibleNPCs);
+    shuffleArray(possibleNPCs);
 
     for (const npc of possibleNPCs) {
       assignedNPCs.add(npc.id);
@@ -73,13 +58,6 @@ export class NPCManager extends Serializable {
     }
 
     return false; // No valid assignment for this requirement
-  }
-
-  private shuffleArray(array: any[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // swap elements
-    }
   }
 }
 

@@ -3,7 +3,7 @@
 <<set _passage to _storylet.passages[$storylet.passage]>>
 <<set _npcs to $storylet.npcs>>
 <<for _slotName, _npc in _npcs>>
-  <<run State.temporary[_slotName] = _npc>>
+  <<set State.temporary[_slotName] = _npc>>
 <</for>>
 
 <<= _passage>>
@@ -91,14 +91,24 @@
 
     <!-- NPCs Overview -->
     <section class="npcs-overview">
-        <header class="header">NPCs</header>
-        <div class="card">
+      <header class="header">NPCs</header>
+      <div class="card">
+        <table class="npcs-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+            </tr>
+          </thead>
+          <tbody>
             <<for _npc range $npcManager.npcs>>
-            <div class="npc">
-                ID: <<=_npc.id>><br>
-                Full Name: <<=_npc.fullName>>
-            </div>
+            <tr>
+              <td><<= _npc.id>></td>
+              <td><<= _npc.fullName>></td>
+            </tr>
             <</for>>
-        </div>
+          </tbody>
+        </table>    
+      </div>
     </section>
 </div>
