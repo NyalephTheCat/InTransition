@@ -54,13 +54,13 @@ export class DatabaseManager<T extends Serializable> {
   }
 
   async addItem(storeName: string, item: T): Promise<void> {
-    const serializedItem = JSON.stringify(item);
-    return this.performWriteOperation(storeName, serializedItem, 'add');
+    const dataToStore = { id: item.id, data: JSON.stringify(item) };
+    return this.performWriteOperation(storeName, dataToStore, 'add');
   }
 
   async updateItem(storeName: string, item: T): Promise<void> {
-    const serializedItem = JSON.stringify(item);
-    return this.performWriteOperation(storeName, serializedItem, 'put');
+    const dataToStore = { id: item.id, data: JSON.stringify(item) };
+    return this.performWriteOperation(storeName, dataToStore, 'put');
   }
 
   async deleteItem(storeName: string, key: IDBValidKey): Promise<void> {
@@ -124,12 +124,9 @@ export class DatabaseManager<T extends Serializable> {
 
       return new Promise((resolve, reject) => {
         request.onsuccess = () => {
-          const result = request.result;
-          if (operation === 'getAll') {
-            resolve(result.map((res: any) => JSON.parse(res)));
-          } else {
-            resolve(JSON.parse(result));
-          }
+          const results = request.result;
+          const parsedResults = (operation === 'getAll') ? results.map((res: any) => JSON.parse(res.data)) : JSON.parse(results.data);
+          resolve(parsedResults);
           console.log(`Item(s) ${operation} successfully.`);
         };
 
