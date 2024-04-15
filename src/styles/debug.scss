@@ -1,0 +1,78 @@
+#passage-debugscreen {
+
+// Header styling
+header {
+  background: $header-gradient;
+  color: $dark-grey;
+  padding: $base-padding;
+  font-family: 'Montserrat', sans-serif;
+  font-size: $large-font-size;
+  text-align: center;
+}
+
+// Card container styling
+.card-container {
+  gap: $small-padding;
+
+  @include respond-from(tablet) {
+    flex-direction: row;
+  }
+}
+
+// Card styling
+.card {
+  background: $trans-white;
+  border: 1px solid $soft-grey;
+  box-shadow: 0 4px 6px rgba($dark-grey, 0.1);
+  margin: $small-padding;
+  padding: $base-padding;
+  flex: 1;
+
+  h2 {
+    color: darken($trans-pink, 15%);
+  }
+}
+
+// Styling for interactive elements
+details {
+  background: $trans-white;
+  padding: $small-padding;
+  margin-top: $small-padding;
+  border-radius: 5px;
+
+  summary {
+    font-weight: bold;
+    cursor: pointer;
+
+    &::after {
+      content: '▼';
+      float: right;
+    }
+  }
+
+  &[open] {
+    summary::after {
+      content: '▲';
+    }
+  }
+}
+
+// Tags and NPC styling
+.tags-container, .npcs, .passages {
+  padding-top: $small-padding;
+
+  .tag, .start {
+    display: inline-block;
+    background-color: $trans-pink;
+    color: $trans-white;
+    padding: 2px $small-padding;
+    border-radius: 5px;
+    font-size: $small-font-size;
+  }
+
+  .start {
+    background-color: $trans-blue;
+  }
+}
+
+}

@@ -20,7 +20,7 @@ You are playing version <<= $version >> of the game.
 
 Ready to start your journey? [[Let's go|StoryStart]].
 
-[[StoryletDebug]]
+[[DebugScreen]]
 
 :: StoryStart
 <<set $story = {
