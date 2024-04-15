@@ -1,7 +1,12 @@
 import { NPC } from "../models/npc";
 import { RequirementAlways, RequirementLastName, RequirementStoryletPlayed } from "../models/requirement";
 import { Storylet } from "../models/storylet";
-import { clearDatabase, openDatabase } from "../utils/database";
+import { DatabaseManager, ObjectStoreConfig } from "../utils/database";
+
+// Instantiate the database manager
+const storyletDBConfig: ObjectStoreConfig[] = [{ name: 'storylets', keyPath: 'id' }];
+const storyletDBManager = new DatabaseManager<Storylet>('NarrativeDatabase', 1, storyletDBConfig);
+
 
 export class NarrativeManager {
   static storylets: Record<string, Storylet> = {};
@@ -13,17 +18,11 @@ export class NarrativeManager {
 
   static async init() {
     try {
-      const db: IDBDatabase = await openDatabase();
-      const transaction = db.transaction(['storylets'], 'readonly');
-      const store = transaction.objectStore('storylets');
-      const request = store.getAll();
-
-      request.onsuccess = (e: any) => {
-        const storylets = e.target.result;
-        storylets.forEach((storylet: { id: string, data: string }) => {
-          NarrativeManager.storylets[storylet.id] = JSON.parse(storylet.data);
-        });
-      };
+      const storylets = await storyletDBManager.getAll('storylets');
+      storylets.forEach((storylet: Storylet) => {
+        NarrativeManager.storylets[storylet.id] = storylet;
+      });
+      console.log("Storylets initialized from database.");
     } catch (error) {
       console.error('Failed to initialize storylets from IndexedDB:', error);
     }
@@ -31,8 +30,9 @@ export class NarrativeManager {
 
   static async clear() {
     try {
-      await clearDatabase();
+      await storyletDBManager.clear();
       this.storylets = {};
+      console.log("Storylets cleared from database.");
     } catch (error) {
       console.error('Failed to clear IndexedDB:', error);
     }
@@ -41,16 +41,8 @@ export class NarrativeManager {
   static async addStorylet(storylet: Storylet, asPlayable: boolean = false) {
     this.storylets[storylet.id] = storylet;
     try {
-      const db: IDBDatabase = await openDatabase();
-      const transaction = db.transaction(['storylets'], 'readwrite');
-      const store = transaction.objectStore('storylets');
-
-      const toStore = {
-        id: storylet.id,
-        data: JSON.stringify(storylet),
-      }
-
-      store.put(toStore);
+      await storyletDBManager.updateItem('storylets', storylet);
+      console.log("Storylet saved to database.");
     } catch (error) {
       console.error('Failed to save storylet to IndexedDB:', error);
     }
@@ -59,6 +51,7 @@ export class NarrativeManager {
       (State.variables as any).playableStorylets.add(storylet.id);
     }
   }
+
 
   static addStorylets(storylets: any[], asPlayable: boolean = false) {
     storylets.forEach(async (storylet) => {
