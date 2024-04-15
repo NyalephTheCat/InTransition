@@ -15,7 +15,7 @@ export class NPCManager extends Serializable {
   }
 
   findNPC(requirement: Requirement): NPC[] {
-    return Object.values(this.npcs).filter(npc => requirement?.check(npc));
+    return Object.values(this.npcs).filter(npc => requirement.check(npc));
   }
 
   findNPCs(requirements: Record<string, Requirement>): Record<string, NPC> | null {

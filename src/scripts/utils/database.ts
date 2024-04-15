@@ -1,12 +1,14 @@
+import { Serializable } from "./serialize";
+
 export interface ObjectStoreConfig {
   name: string;
   keyPath: string;
 }
 
-export class DatabaseManager<T> {
+export class DatabaseManager<T extends Serializable> {
   private db: IDBDatabase | null = null;
 
-  constructor(private name: string, private version: number, private objectStores: ObjectStoreConfig[]) {}
+  constructor(private name: string, private version: number, private objectStores: ObjectStoreConfig[], private emptyValue: T) {}
 
   private async ensureDatabase(): Promise<IDBDatabase> {
     if (!this.db) {
@@ -52,118 +54,25 @@ export class DatabaseManager<T> {
   }
 
   async addItem(storeName: string, item: T): Promise<void> {
-    try {
-      await this.ensureDatabase();
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.add(item);
-
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => {
-          console.log("Item added successfully.");
-          resolve();
-        };
-
-        request.onerror = (event: Event) => {
-          console.error("Error adding item:", (event.target as IDBRequest).error?.message);
-          reject(new Error('Error adding item: ' + (event.target as IDBRequest).error?.message));
-        };
-      });
-    } finally {
-      this.close();
-    }
-  }
-
-  async getItem(storeName: string, key: IDBValidKey): Promise<T | undefined> {
-    try {
-      await this.ensureDatabase();
-      const transaction = this.db!.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.get(key);
-
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => {
-          console.log("Item retrieved successfully.");
-          resolve(request.result);
-        };
-
-        request.onerror = (event: Event) => {
-          console.error("Error retrieving item:", (event.target as IDBRequest).error?.message);
-          reject(new Error('Error retrieving item: ' + (event.target as IDBRequest).error?.message));
-        };
-      });
-    } finally {
-      this.close();
-    }
+    const serializedItem = JSON.stringify(item);
+    return this.performWriteOperation(storeName, serializedItem, 'add');
   }
 
   async updateItem(storeName: string, item: T): Promise<void> {
-    try {
-      await this.ensureDatabase();
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.put(item);
-
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => {
-          console.log("Item updated successfully.");
-          resolve();
-        };
-
-        request.onerror = (event: Event) => {
-          console.error("Error updating item:", (event.target as IDBRequest).error?.message);
-          reject(new Error('Error updating item: ' + (event.target as IDBRequest).error?.message));
-        };
-      });
-    } finally {
-      this.close();
-    }
+    const serializedItem = JSON.stringify(item);
+    return this.performWriteOperation(storeName, serializedItem, 'put');
   }
 
   async deleteItem(storeName: string, key: IDBValidKey): Promise<void> {
-    try {
-      await this.ensureDatabase();
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.delete(key);
+    return this.performWriteOperation(storeName, key, 'delete');
+  }
 
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => {
-          console.log("Item deleted successfully.");
-          resolve();
-        };
-
-        request.onerror = (event: Event) => {
-          console.error("Error deleting item:", (event.target as IDBRequest).error?.message);
-          reject(new Error('Error deleting item: ' + (event.target as IDBRequest).error?.message));
-        };
-      });
-    } finally {
-      this.close();
-    }
+  async getItem(storeName: string, key: IDBValidKey): Promise<T | undefined> {
+    return this.performReadOperation(storeName, key, 'get');
   }
 
   async getAll(storeName: string): Promise<T[]> {
-    try {
-      await this.ensureDatabase();
-      const transaction = this.db!.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAll();
-
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => {
-          console.log("All items retrieved successfully.");
-          resolve(request.result);
-        };
-
-        request.onerror = (event: Event) => {
-          console.error("Error retrieving all items:", (event.target as IDBRequest).error?.message);
-          reject(new Error('Error retrieving all items: ' + (event.target as IDBRequest).error?.message));
-        };
-      });
-    } finally {
-      this.close();
-    }
+    return this.performReadOperation(storeName, null, 'getAll');
   }
 
   async clear(): Promise<void> {
@@ -177,6 +86,57 @@ export class DatabaseManager<T> {
 
       return Promise.all(clearPromises).then(() => {
         console.log("All stores cleared successfully.");
+      });
+    } finally {
+      this.close();
+    }
+  }
+
+  private async performWriteOperation(storeName: string, data: any, operation: 'add' | 'put' | 'delete'): Promise<void> {
+    try {
+      await this.ensureDatabase();
+      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = (operation === 'delete') ? store.delete(data) : store[operation](data);
+
+      return new Promise((resolve, reject) => {
+        request.onsuccess = () => {
+          console.log(`Item ${operation}ed successfully.`);
+          resolve();
+        };
+
+        request.onerror = (event: Event) => {
+          console.error(`Error ${operation}ing item:`, (event.target as IDBRequest).error?.message);
+          reject(new Error(`Error ${operation}ing item: ` + (event.target as IDBRequest).error?.message));
+        };
+      });
+    } finally {
+      this.close();
+    }
+  }
+
+  private async performReadOperation(storeName: string, key: any, operation: 'get' | 'getAll'): Promise<any> {
+    try {
+      await this.ensureDatabase();
+      const transaction = this.db!.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = (operation === 'get') ? store.get(key) : store.getAll();
+
+      return new Promise((resolve, reject) => {
+        request.onsuccess = () => {
+          const result = request.result;
+          if (operation === 'getAll') {
+            resolve(result.map((res: any) => JSON.parse(res)));
+          } else {
+            resolve(JSON.parse(result));
+          }
+          console.log(`Item(s) ${operation} successfully.`);
+        };
+
+        request.onerror = (event: Event) => {
+          console.error(`Error ${operation} item:`, (event.target as IDBRequest).error?.message);
+          reject(new Error(`Error ${operation} item: ` + (event.target as IDBRequest).error?.message));
+        };
       });
     } finally {
       this.close();

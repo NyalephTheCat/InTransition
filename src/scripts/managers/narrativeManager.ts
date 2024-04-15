@@ -1,11 +1,10 @@
 import { NPC } from "../models/npc";
-import { RequirementAlways, RequirementLastName, RequirementStoryletPlayed } from "../models/requirement";
 import { Storylet } from "../models/storylet";
 import { DatabaseManager, ObjectStoreConfig } from "../utils/database";
 
 // Instantiate the database manager
 const storyletDBConfig: ObjectStoreConfig[] = [{ name: 'storylets', keyPath: 'id' }];
-const storyletDBManager = new DatabaseManager<Storylet>('NarrativeDatabase', 1, storyletDBConfig);
+const storyletDBManager = new DatabaseManager<Storylet>('NarrativeDatabase', 1, storyletDBConfig, new Storylet());
 
 
 export class NarrativeManager {
@@ -123,23 +122,3 @@ Setting.addToggle("clearStorylets", {
     (settings as any).clearStorylets = false;
   },
 });
-
-
-
-NarrativeManager.addStorylets([
-  new Storylet("base:intro", "Introduction", "nyaleph", {
-    base_intro_start: null,
-    base_intro_end: null,
-  }, "base_intro_start", 1, 0, undefined, false, {
-    npc1: new RequirementLastName("Smith"),
-    npc2: new RequirementAlways(true),
-  }, new Set(["base", "intro"])),
-], true);
-
-NarrativeManager.addStorylet(
-  new Storylet("base:outro", "Outro", "nyaleph", {
-    base_outro_start: null,
-    base_outro_end: null,
-  }, "base_outro_start", 1, 0, new RequirementStoryletPlayed("base:intro")),
-  true
-);

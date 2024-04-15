@@ -1,13 +1,3 @@
-:: StoryInit
-<<set $story = {
-  location: "In transition",
-  time: null
-}>>
-<<set $event = {
-  name: "Intro",
-  author: "Nyaleph",
-}>>
-
 :: Start
 
 Welcome to <strong>In Transition</strong>, a game where you explore your gender identity while facing the ups and downs of moving into a new town. It's about finding out who you are and dealing with life's twists and turns along the way.
