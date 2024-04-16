@@ -9,106 +9,89 @@
 <<= _passage>>
 
 :: DebugScreen [nobr]
-<!-- Storylet Debugging Interface -->
 <div class="debug-container">
-
-    <!-- Header -->
-    <header class="header">Storylet Debug</header>
-
-    <!-- Storylets Overview -->
-    <section class="card-container">
-        <article class="card">
-            <h2>Existing Storylets</h2>
-            <div class="storylet-list">
-                <<for _storylet range NarrativeManager.storylets>>
-                <div class="storylet-item">
-                    <details>
-                        <summary><strong><<=_storylet.title>></strong></summary>
-                        <p>ID: <<= _storylet.id>></p>
-                        <p>Author: <<= _storylet.author>></p>
-                        <p>Weight: <<= _storylet.weight>></p>
-                        <p>Priority: <<= _storylet.priority>></p>
-                        <p>Replayable: <<= _storylet.replayable ? "Yes" : "No">></p>
-                        <div class="tags-container">
-                            <<for _tag range _storylet.tags>>
-                            <span class="tag"><<=_tag>></span>
-                            <</for>>
-                        </div>
-                        <p>Requirements: <<requirement _storylet.requirements>></p>
-                        <div class="passages">
-                            Passages:
-                            <ul>
-                                <<for _passageId, _passageContent range _storylet.passages>>
-                                <li><<storylet _passageId _storylet.id _passageId>> <<if _passageId == _storylet.startPassage>><span class="tag start">Start</span><</if>></li>
-                                <</for>>
-                            </ul>
-                        </div>
-                        <div class="npcs">
-                            NPCs:
-                            <<if Object.keys(_storylet.npcs).length>>
-                            <ul>
-                                <<for _npcId, _npcRequirement range _storylet.npcs>>
-                                <li>
-                                ID: <<=_npcId>><br>
-                                Requirement: <<requirement _npcRequirement>><br>
-                                Npcs: <ul><<for _npcForSlot range $npcManager.findNPC(_npcRequirement)>>
-                                  <li><<= _npcForSlot.fullName>></li>
-                                <</for>></ul>
-                                </li>
-                                <</for>>
-                            </ul>
-                            <<else>>
-                            <i>No NPCs</i>
-                            <</if>>
-                        </div>
-                    </details>
-                </div>
-                <</for>>
-            </div>
-        </article>
-
-        <article class="card">
-            <h2>Playable Storylets</h2>
-            <ul class="playable-storylets">
-                <<for _storylet range $playableStorylets>>
-                <li><<= _storylet>></li>
-                <</for>>
-            </ul>
-        </article>
-
-        <article class="card">
-            <h2>Current Storylet</h2>
-            <<if $storylet>>
-            <div>
-                ID: <<=$storylet.id>><br>
-                Passage: <<=$storylet.passage>>
-            </div>
-            <<else>>
-            <i>No storylet selected</i>
-            <</if>>
-        </article>
-    </section>
-
-    <!-- NPCs Overview -->
-    <section class="npcs-overview">
-      <header class="header">NPCs</header>
-      <div class="card">
-        <table class="npcs-table">
-          <thead>
+  <<tabs>>
+    <<tab "Existing Storylets">>
+      <table class="storylet-list">
+        <<for _storylet range NarrativeManager.storylets>>
+          <tr class="storylet-item">
+            <td>
+              <div>
+                <strong>_storylet.title</strong>
+                <<tabs>>
+                  <<tab "Details">>
+                    <table>
+                      <tr><td>ID:</td><td>_storylet.id</td></tr>
+                      <tr><td>Author:</td><td>_storylet.author</td></tr>
+                      <tr><td>Weight:</td><td>_storylet.weight</td></tr>
+                      <tr><td>Priority:</td><td>_storylet.priority</td></tr>
+                      <tr><td>Replayable:</td><td><<= _storylet.replayable ? "Yes" : "No">></td></tr>
+                      <tr><td>Tags:</td><td><div class="tags-container">
+                        <<for _tag range _storylet.tags>>
+                          <div class="tag">_tag</div>
+                        <</for>>
+                      </div></td></tr>
+                      <tr><td>Requirements:</td><td><<requirement _storylet.requirements>></td></tr>
+                    </table>
+                  <<tab "Passages">>
+                    <ul>
+                      <<for _passageId, _passageContent range _storylet.passages>>
+                        <li><<storylet _passageId _storylet.id _passageId>> <<if _passageId == _storylet.startPassage>><span class="tag start">Start</span><</if>></li>
+                      <</for>>
+                    </ul>
+                  <<tab "NPCs">>
+                    <<if Object.keys(_storylet.npcs).length>>
+                      <ul>
+                        <<for _npcId, _npcRequirement range _storylet.npcs>>
+                          <li>
+                            ID: _npcId<br>
+                            Requirement: <<requirement _npcRequirement>><br>
+                            Valid: <ul><<for _npcForSlot range $npcManager.findNPC(_npcRequirement)>>
+                              <li>_npcForSlot.fullName</li>
+                            <</for>></ul>
+                          </li>
+                        <</for>>
+                      </ul>
+                    <<else>>
+                      <i>No NPCs</i>
+                    <</if>>
+                <</tabs>>
+              </div>
+            </td>
+          </tr>
+        <</for>>
+      </table>
+    <<tab "Playable Storylets">>
+      <ul class="playable-storylets">
+        <<for _storylet range $playableStorylets>>
+          <li><<= _storylet>></li>
+        <</for>>
+      </ul>
+    <<tab "Current Storylet">>
+      <<if $storylet>>
+        <div>
+          ID: <<=$storylet.id>><br>
+          Passage: <<=$storylet.passage>>
+        </div>
+      <<else>>
+        <i>No storylet selected</i>
+      <</if>>
+    <<tab "NPCs Overview">>
+      <table class="npcs-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <<for _npc range $npcManager.npcs>>
             <tr>
-              <th>ID</th>
-              <th>Full Name</th>
+              <td>_npc.id</td>
+              <td>_npc.fullName</td>
             </tr>
-          </thead>
-          <tbody>
-            <<for _npc range $npcManager.npcs>>
-            <tr>
-              <td><<= _npc.id>></td>
-              <td><<= _npc.fullName>></td>
-            </tr>
-            <</for>>
-          </tbody>
-        </table>    
-      </div>
-    </section>
+          <</for>>
+        </tbody>
+      </table>
+  <</tabs>>
 </div>

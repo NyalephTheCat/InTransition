@@ -13,11 +13,9 @@ import './utils/arrays';
 
 import './macros/storylets';
 import './macros/note';
+import './macros/tabs';
 import { Storylet } from "./models/storylet";
-import { RequirementLastName, RequirementAlways, RequirementStoryletPlayed } from "./models/requirement";
-
-
-
+import { RequirementLastName, RequirementAlways, RequirementStoryletPlayed } from "./models/requirement"; 
 
 Save.onSave.add((save: SaveObject, details: SaveDetails) => {
   // Save all storylet informations
@@ -36,9 +34,9 @@ NarrativeManager.addStorylets([
     base_intro_start: null,
     base_intro_end: null,
   }, "base_intro_start", 1, 0, undefined, false, {
-    npc1: new RequirementLastName("Smith"),
+    npc1: new RequirementLastName("Blofis"),
     npc2: new RequirementAlways(true),
-  }, new Set(["base", "intro"])),
+  }, new Set(["base", "intro"]))
 ], true);
 
 NarrativeManager.addStorylet(

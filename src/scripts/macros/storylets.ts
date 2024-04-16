@@ -5,12 +5,12 @@ Macro.add("storylet", {
   handler() {
     let storyletId;
     let storylet;
-    let npcs: Record<string, NPC> = {};
+    let npcs;
     let message = this.args[0] ?? "Continue";
     if (this.args.length >= 2) {
       storyletId = this.args[1];
       storylet = NarrativeManager.getStorylet(storyletId);
-      npcs = (State.variables as any).npcManager.findNPCs(storylet.npcs)
+      npcs = State.variables.npcManager.findNPCs(storylet.npcs)
     } else {
       let _res = NarrativeManager.pickStorylet();
       if (!_res) {
@@ -30,7 +30,7 @@ Macro.add("storylet", {
 
     $(this.output).append(
       $('<a>', { class: 'macro-link', text: message, click: () => {
-        storylet.start(npcs);
+        storylet.start(npcs ?? {});
         
         if (passage)
           storylet.next(passage);
@@ -45,7 +45,7 @@ Macro.add("storylet", {
 
 Macro.add("storyletLink", {
   handler() {
-    if (!(State.variables as any).storylet) {
+    if (!State.variables.storylet) {
       return this.error("No active storylet found.");
     }
 
@@ -59,7 +59,7 @@ Macro.add("storyletLink", {
 
 Macro.add("storyletClose", {
   handler() {
-    if (!(State.variables as any).storylet) {
+    if (!State.variables.storylet) {
       return this.error("No active storylet found.");
     }
 

@@ -33,7 +33,7 @@ export class Storylet extends Serializable {
   }
 
   start(npcs: Record<string, NPC>) {
-    (State.variables as any).storylet = {
+    State.variables.storylet = {
       id: this.id,
       passage: this.startPassage,
       npcs,
@@ -41,14 +41,18 @@ export class Storylet extends Serializable {
   }
 
   next(passage: string) {
-    (State.variables as any).storylet = Object.assign({
+    if (!State.variables.storylet) {
+      throw new Error("Storylet not started");
+    }
+    
+    State.variables.storylet = {
       id: this.id,
       passage,      
-    }, (State.variables as any).storylet);
+      npcs: State.variables.storylet.npcs,
+    };
   }
 
   close() {
-    delete (State.variables as any).storylet;
+    delete State.variables.storylet;
   }
 }
-(window as any).Storylet = Storylet;

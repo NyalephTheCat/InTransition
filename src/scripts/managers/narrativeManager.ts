@@ -47,7 +47,7 @@ export class NarrativeManager {
     }
 
     if (asPlayable) {
-      (State.variables as any).playableStorylets.add(storylet.id);
+      State.variables.playableStorylets.add(storylet.id);
     }
   }
 
@@ -59,21 +59,21 @@ export class NarrativeManager {
   }
 
   static get available(): Set<string> {
-    return new Set(Array.from((State.variables as any).playableStorylets as Set<string>)
+    return new Set(Array.from(State.variables.playableStorylets)
     .map(id => this.storylets[id])
     .filter(storylet => {
       const requirementsMet = !storylet.requirements || storylet.requirements.check();
-      const npcRequirementsMet = storylet.npcs ? (State.variables as any).npcManager.findNPCs(storylet.npcs) !== null : true;
+      const npcRequirementsMet = storylet.npcs ? State.variables.npcManager.findNPCs(storylet.npcs) !== null : true;
       const isReplayableOrNew = storylet.replayable || !this.playedStorylets.has(storylet.id);
       return requirementsMet && npcRequirementsMet && isReplayableOrNew;
     }).map(storylet => storylet.id))
   }
-
+  
   static pickStorylet(context: any = {}): { storylet: Storylet, assignedNPCs: Record<string, NPC> } | undefined {
-    if ((State.variables as any).playableStorylets.size === 0) {
+    if (State.variables.playableStorylets.size === 0) {
       return undefined;
     }
-    const availableStorylets = Array.from((State.variables as any).playableStorylets as Set<string>).map(id => this.storylets[id]);
+    const availableStorylets = Array.from(State.variables.playableStorylets).map(id => this.storylets[id]);
 
     if (availableStorylets.length === 0) {
       return undefined;
@@ -98,27 +98,37 @@ export class NarrativeManager {
     for (const storylet of highestPriorityStorylets) {
       random -= storylet.weight || 1;
       if (random <= 0) {
-        const assignedNPCs = (State.variables as any).npcManager.findNPCs(storylet.npcs);
+        const assignedNPCs = State.variables.npcManager.findNPCs(storylet.npcs);
+
+        if (!assignedNPCs) {
+          return undefined;
+        }
+
         return { storylet, assignedNPCs };
       }
     }
 
     let storylet = highestPriorityStorylets[0];  // Assuming random selection logic results in this storylet
-    const assignedNPCs = (State.variables as any).npcManager.findNPCs(storylet.npcs);
+    const assignedNPCs = State.variables.npcManager.findNPCs(storylet.npcs);
+
+    if (!assignedNPCs) {
+      return undefined;
+    }
+
     return { storylet, assignedNPCs };
   }
 }
-(window as any).NarrativeManager = NarrativeManager;
 $(NarrativeManager.init);
-(State.variables as any).playableStorylets = new Set();
+State.variables.playableStorylets = new Set();
 
 Setting.addToggle("clearStorylets", {
   label: "Clear Storylets",
   default: false,
   onChange: () => {
-    if ((settings as any).clearStorylets) {
+    if (settings.clearStorylets) {
       NarrativeManager.clear();
     }
-    (settings as any).clearStorylets = false;
+    settings.clearStorylets = false;
   },
 });
+window.NarrativeManager = NarrativeManager;

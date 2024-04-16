@@ -43,7 +43,6 @@ export class RequirementComposite extends Requirement {
     return $container;
   }
 }
-(window as any).RequirementComposite = RequirementComposite;
 
 export class RequirementStoryletPlayed extends Requirement {
   constructor(
@@ -62,7 +61,6 @@ export class RequirementStoryletPlayed extends Requirement {
     return $(`<span>Storylet "${this.storyletId}" ${playedString}</span>`);
   }
 }
-(window as any).RequirementStoryletPlayed = RequirementStoryletPlayed;
 
 export class RequirementAlways extends Requirement {
   constructor(expected: boolean = true) {
@@ -77,7 +75,6 @@ export class RequirementAlways extends Requirement {
     return $('<span>Always</span>');
   }
 }
-(window as any).RequirementAlways = RequirementAlways;
 
 export class RequirementVariable extends Requirement {
   constructor(
@@ -96,7 +93,6 @@ export class RequirementVariable extends Requirement {
     return $(`<span>${this.variable} </span>`).add(this.requirement.display());
   }
 }
-(window as any).RequirementVariable = RequirementVariable;
 
 export enum RequirementVariableComparator { 
   EQ = "==",
@@ -140,7 +136,6 @@ export class RequirementVariableComp<T> extends Requirement {
     return $(`<span>${this.comparator} ${this.expectedValue}</span>`);
   }
 }
-(window as any).RequirementVariableComp = RequirementVariableComp;
 
 export class RequirementLastName extends Requirement {
   constructor(
@@ -158,7 +153,6 @@ export class RequirementLastName extends Requirement {
     return $(`<span>Last name is ${this.lastName}</span>`);
   }
 }
-(window as any).RequirementLastName = RequirementLastName;
 
 Macro.add("requirement", {
   handler() {

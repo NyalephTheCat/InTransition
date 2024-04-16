@@ -20,3 +20,4 @@ export class NPC extends Serializable {
     return `${this.firstName} ${this.lastName}`;
   }
 }
+window.NPC = NPC;

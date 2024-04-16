@@ -60,18 +60,4 @@ export class NPCManager extends Serializable {
     return false; // No valid assignment for this requirement
   }
 }
-
-(window as any).NPCManager = NPCManager;
-// Create an npc manager inside of the state variables
-$(() => {
-  if (!(State.variables as any).npcManager) {
-    (State.variables as any).npcManager = new NPCManager();
-
-    // Add some default NPCs
-    (State.variables as any).npcManager.addNPC(new NPC('1', 'Alice', 'Smith'));
-    (State.variables as any).npcManager.addNPC(new NPC('2', 'Bob', 'Johnson'));
-    (State.variables as any).npcManager.addNPC(new NPC('3', 'Charlie', 'Brown'));
-    (State.variables as any).npcManager.addNPC(new NPC('4', 'David', 'Davis'));
-
-  }
-});
+window.NPCManager = NPCManager;

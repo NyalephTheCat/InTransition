@@ -14,7 +14,10 @@ InTransition
   location: "In transition",
   time: null
 }>>
-<<set $event = {
-  name: "Intro",
-  author: "Nyaleph",
-}>>
+<<set $npcManager to new NPCManager()>>
+<<run $npcManager.addNPC(new NPC("base:alice", "Alice", "Altair"))>>
+<<run $npcManager.addNPC(new NPC("base:bob", "Bob", "Blofis"))>>
+<<run $npcManager.addNPC(new NPC("base:charlie", "Charlie", "Carter"))>>
+<<run $npcManager.addNPC(new NPC("base:daisy", "Daisy", "Davenport"))>>
+<<run $npcManager.addNPC(new NPC("base:edward", "Edward", "Eisenhower"))>>
+<<run $npcManager.addNPC(new NPC("base:frank", "Frank", "Fitzgerald"))>>
