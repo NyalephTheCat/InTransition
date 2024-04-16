@@ -1,57 +1,67 @@
-import { Mod, ModData } from '../models/mod';
-import { DatabaseManager, ObjectStoreConfig } from '../utils/database';
+import { Mod } from "../models/mod";
+import { DatabaseManager } from "../utils/database";
 
 export class ModManager {
-    private static dbManager: DatabaseManager<Mod>;
-    private static initialized = false;
+  static dbManager = new DatabaseManager<Mod>('ModDatabase', 1, [{ name: 'mods', keyPath: 'id' }], new Mod());
+  static mods: Record<string, Mod> = {};
 
-    static initialize(dbName: string, dbVersion: number): void {
-        if (!this.initialized) {
-            const objectStores: ObjectStoreConfig[] = [{
-                name: "mods",
-                keyPath: "id"
-            }];
-            this.dbManager = new DatabaseManager<Mod>(dbName, dbVersion, objectStores, new Mod());
-            this.initialized = true;
-        }
+  static async init() {
+    try {
+      const mods = await ModManager.dbManager.getAll('mods');
+      mods.forEach((mod: Mod) => {
+        ModManager.mods[mod.id] = mod;
+      });
+      console.log("Mods initialized from database.");
+    } catch (error) {
+      console.error('Failed to initialize mods from IndexedDB:', error);
     }
+  }
 
-    static async loadMod(modData: ModData): Promise<Mod> {
-        const mod = new Mod();
-        Object.assign(mod, modData);
-        if (mod.isCompatible) {
-            await this.dbManager.addItem("mods", mod);
-            console.log(`Mod ${mod.name} loaded and added to database.`);
-        } else {
-            console.error(`Mod ${mod.name} is not compatible with the current game version.`);
-        }
-        return mod;
+  static async clear() {
+    try {
+      await ModManager.dbManager.clear();
+      this.mods = {};
+      console.log("Mods cleared from database.");
+    } catch (error) {
+      console.error('Failed to clear IndexedDB:', error);
     }
+  }
 
-    static async getMod(id: string): Promise<Mod | undefined> {
-        try {
-            const mod = await this.dbManager.getItem("mods", id);
-            return mod;
-        } catch (error) {
-            console.error('Failed to retrieve mod:', error);
-            return undefined;
-        }
+  static async addMod(mod: Mod|[key: keyof Mod]) {
+    mod = mod instanceof Mod ? mod : new Mod()._init(mod);
+    try {
+        await ModManager.dbManager.updateItem('mods', mod);
+        console.log(`Mod ${mod.name} saved to database.`);
+    } catch (error) {
+        ModManager.mods[mod.id] = mod;
+        console.error('Failed to save mod to IndexedDB:', error);
     }
+  }
 
-    static async updateMod(modData: ModData): Promise<void> {
-        const mod = new Mod();
-        Object.assign(mod, modData);
-        await this.dbManager.updateItem("mods", mod);
-        console.log(`Mod ${mod.name} updated in the database.`);
-    }
+  static addMods(mods: Mod[]) {
+    mods.forEach(async (mod) => {
+      await this.addMod(mod);
+    });
+  }
 
-    static async deleteMod(id: string): Promise<void> {
-        await this.dbManager.deleteItem("mods", id);
-        console.log(`Mod with id ${id} deleted from the database.`);
-    }
+  static getMod(id: string): Mod | undefined {
+    return ModManager.mods[id];
+  }
 
-    static async listAllMods(): Promise<Mod[]> {
-        return await this.dbManager.getAll("mods");
+  static async deleteMod(id: string) {
+    if (ModManager.mods[id]) {
+      delete ModManager.mods[id];
+      await ModManager.dbManager.deleteItem("mods", id);
+      console.log(`Mod with id ${id} deleted from the database.`);
+    } else {
+      console.error(`Mod with id ${id} not found.`);
     }
+  }
+
+  static listAllMods(): Mod[] {
+    return Object.values(ModManager.mods);
+  }
 }
-$(ModManager.initialize);
+
+$(ModManager.init);
+window.ModManager = ModManager;

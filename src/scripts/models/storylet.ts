@@ -56,3 +56,4 @@ export class Storylet extends Serializable {
     delete State.variables.storylet;
   }
 }
+window.Storylet = Storylet;

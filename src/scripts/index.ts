@@ -14,6 +14,9 @@ import './utils/arrays';
 import './macros/storylets';
 import './macros/note';
 import './macros/tabs';
+import './macros/requirement';
+import './macros/mod';
+
 import { Storylet } from "./models/storylet";
 import { RequirementLastName, RequirementAlways, RequirementStoryletPlayed } from "./models/requirement"; 
 

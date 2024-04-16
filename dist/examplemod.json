@@ -1,0 +1,12 @@
+{
+  "id": "example-2",
+  "name": "ExampleMod",
+  "version": "1.0.0",
+  "gameVersion": ">=0.0.0",
+  "description": "An example mod for the mod loader.",
+  "author": "Nyaleph",
+  "tags": [ "example" ],
+  "data": {
+
+  }
+}

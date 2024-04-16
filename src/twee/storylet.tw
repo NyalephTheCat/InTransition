@@ -93,5 +93,7 @@
           <</for>>
         </tbody>
       </table>
+      <<tab "All Mods">>
+      <<uploadMod>>
   <</tabs>>
 </div>

@@ -9,6 +9,7 @@ export abstract class Requirement extends Serializable {
 
   abstract display(): JQuery<HTMLElement>;
 }
+window.Requirement = Requirement;
 
 export enum RequirementCompositeOperator { AND = "AND", OR = "OR" }
 export class RequirementComposite extends Requirement {
@@ -43,6 +44,7 @@ export class RequirementComposite extends Requirement {
     return $container;
   }
 }
+window.RequirementComposite = RequirementComposite;
 
 export class RequirementStoryletPlayed extends Requirement {
   constructor(
@@ -61,6 +63,7 @@ export class RequirementStoryletPlayed extends Requirement {
     return $(`<span>Storylet "${this.storyletId}" ${playedString}</span>`);
   }
 }
+window.RequirementStoryletPlayed = RequirementStoryletPlayed;
 
 export class RequirementAlways extends Requirement {
   constructor(expected: boolean = true) {
@@ -75,6 +78,7 @@ export class RequirementAlways extends Requirement {
     return $('<span>Always</span>');
   }
 }
+window.RequirementAlways = RequirementAlways;
 
 export class RequirementVariable extends Requirement {
   constructor(
@@ -93,6 +97,7 @@ export class RequirementVariable extends Requirement {
     return $(`<span>${this.variable} </span>`).add(this.requirement.display());
   }
 }
+window.RequirementVariable = RequirementVariable;
 
 export enum RequirementVariableComparator { 
   EQ = "==",
@@ -136,6 +141,7 @@ export class RequirementVariableComp<T> extends Requirement {
     return $(`<span>${this.comparator} ${this.expectedValue}</span>`);
   }
 }
+window.RequirementVariableComp = RequirementVariableComp;
 
 export class RequirementLastName extends Requirement {
   constructor(
@@ -153,14 +159,4 @@ export class RequirementLastName extends Requirement {
     return $(`<span>Last name is ${this.lastName}</span>`);
   }
 }
-
-Macro.add("requirement", {
-  handler() {
-    // displays a requirement passed as an argument
-    const requirement = this.args[0];
-    if (!(requirement instanceof Requirement)) {
-      return;
-    }
-    $(this.output).append(requirement.display());
-  }
-});
+window.RequirementLastName = RequirementLastName;
